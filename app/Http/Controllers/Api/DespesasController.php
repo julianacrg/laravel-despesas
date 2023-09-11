@@ -81,21 +81,27 @@ class DespesasController extends Controller
      * Update the specified resource in storage.
      *
      * @param  App\Http\Requests\DespesasRequest  $request
-     * @param Despesa  $despesa
+     * @param int  $despesa
      * @return \Illuminate\Http\Response
      */
-    public function update(Despesa $despesa, DespesasRequest $request)
+    public function update(int $despesa, DespesasRequest $request)
     {
+        $despesaModel = Despesa::find($despesa);
+
+        if ($despesaModel === null) {
+            return response()->json(['mensagem' => 'Despesa não encontrada'], 404);
+        }
+
         $user = Auth::user();
 
-        if (!$user->can('update', $despesa)) {
+        if (!$user->can('update', $despesaModel)) {
             // O usuário não está autorizado a editar a despesa.
             return response()->json(['mensagem' => 'Acesso não autorizado'], 403);
         }
 
-        $despesa->update($request->all());
+        $despesaModel->update($request->all());
 
-        return $despesa;
+        return $despesaModel;
     }
 
     /**
